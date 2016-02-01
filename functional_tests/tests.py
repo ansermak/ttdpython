@@ -36,9 +36,12 @@ class NewVisitorTest(LiveServerTestCase):
         # is tying fly-fishing lures)
         inputbox.send_keys('Buy peacock feathers')
 
-        # When she hits enter, the page updates, and now the page lists
-        # "1: Buy peacock feathers" as an item in a to-do lists
+        # When she hits enter, she is taking to a new URL,
+        #, and now the page lists "1: Buy peacock feathers" as
+        # an item in a to-do lists
         inputbox.send_keys(Keys.ENTER)
+        masha_list_url = self.browser.current_url
+        self.assertRegex(masha_list_url, '/lists/.+')
         self.check_for_row_in_list_table('1: Buy peacock feathers')
 
         # There is still a text box invitin her to add another item. She
@@ -51,9 +54,36 @@ class NewVisitorTest(LiveServerTestCase):
         # The page updates again, and now shows both items on her list
         self.check_for_row_in_list_table(
             '2: Use peacock feathers to make a fly')
-        # Masha wonders whether the site will remember her list. Then she sees
-        # that the site has generated a unique URL for her -- there is some
-        # explanatory text ot that effect.
+
         self.fail('Finish the test!')
 
-        # Satisfied, she goes back to sleep
+        # Now a new user, Denis, comes along to the site
+
+        ## We use a new browser session to make sure that no information
+        ## of Masha's is coming throught from cookies etc #
+        self.browser.quit()
+        self.browser = webdriver.Firefox()
+
+        # Denis visits the home page. There is no sign of Masha's list
+        self.browser.get(self.live_server_url)
+        page_text = self.browser.find_element_by_tag_name('body').text
+        self.assertNotIn('Buy peacock feathers', page_text)
+        self.assertNotIn('make a fly', page_text)
+
+        # Denis starts a new list by entering a new item. He is less
+        # interesting than Masha
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        inputbox.send_keys('Buy milk')
+        inputbox.send_keys(Keys.ENTER)
+
+        # Denis gets his own unique URL
+        denis_list_url = self.browser.current_url
+        self.assertRegex(denis_list_url, '/lists/.+')
+        self.assertNotEqual(denis_list_url, masha_list_url)
+
+        # Again, there is no trace of Masha's list
+        page_text = self.browser.find_element_by_tag_name('body').text
+        self.assertNotIn('Buy peacock feathers', page_text)
+        self.assertIn('Buy milk', page_text)
+
+        # Satisfied, they both got back to sleep
