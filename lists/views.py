@@ -1,13 +1,5 @@
-from django.http import HttpResponse
 from django.shortcuts import render
 
 
 def home_page(request):
-    return HttpResponse(
-        '''<html>
-            <head>
-                <title>To-Do lists</title>
-            </head>
-            <body>
-            </body>
-        </html>''')
+    return render(request, 'lists/home.html')
