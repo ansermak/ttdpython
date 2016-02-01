@@ -1,14 +1,16 @@
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import redirect, render
+from lists.models import Item
 
 
 def home_page(request):
     if request.method == 'POST':
-        return render(
-            request,
-            'lists/home.html',
-            {
-                'new_item_text': request.POST.get('item_text', '')
-            })
+        item_text = request.POST.get('item_text', '')
+        Item.objects.create(text=item_text)
+        return redirect('/')
 
-    return render(request, 'lists/home.html')
+    items = Item.objects.all()
+    return render(
+        request,
+        'lists/home.html',
+        {'items': items})
