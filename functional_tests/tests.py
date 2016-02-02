@@ -55,7 +55,6 @@ class NewVisitorTest(LiveServerTestCase):
         self.check_for_row_in_list_table(
             '2: Use peacock feathers to make a fly')
 
-        self.fail('Finish the test!')
 
         # Now a new user, Denis, comes along to the site
 
@@ -87,3 +86,4 @@ class NewVisitorTest(LiveServerTestCase):
         self.assertIn('Buy milk', page_text)
 
         # Satisfied, they both got back to sleep
+        self.fail('Finish the test!')
