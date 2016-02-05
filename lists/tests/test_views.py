@@ -6,27 +6,26 @@ from django.template.loader import render_to_string
 from django.test import TestCase
 from django.utils.html import escape
 
+from lists.forms import ItemForm
 from lists.models import Item, List
 from lists.views import home_page
 
 
-class HomePageTest(TestCase):
-    def remove_csrf(self, text):
+def remove_csrf(text):
         csrf_regex = r'<input[^>]+csrfmiddlewaretoken[^>]+>'
         return re.sub(csrf_regex, '', text)
 
-    def test_root_url_resolves_to_home_page_view(self):
-        found = resolve('/')
 
-        self.assertEqual(found.func, home_page)
+class HomePageTest(TestCase):
+    maxDiff = None
+    
+    def test_home_page_renders_home_template(self):
+        response = self.client.get('/')
+        self.assertTemplateUsed(response, 'lists/home.html')
 
-    def test_home_page_returns_correct_html(self):
-        request = HttpRequest()
-        response = home_page(request)
-        expected_html = render_to_string('lists/home.html')
-
-        self.assertEqual(self.remove_csrf(response.content.decode()),
-                         expected_html)
+    def test_home_page_uses_item_form(self):
+        response = self.client.get('/')
+        self.assertIsInstance(response.context['form'], ItemForm)
 
 
 class ListViewTest(TestCase):
