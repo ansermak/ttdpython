@@ -4,7 +4,7 @@ from lists.forms import ItemForm, EMPTY_LIST_ERROR
 
 
 class ItemFormTest(TestCase):
-    def test_from_renders_item_text_input(self):
+    def test_from_renders_text_input(self):
         form = ItemForm()
         self.assertIn('placeholder="Enter a to-do item"', form.as_p())
         self.assertIn('class="form-control input-lg"', form.as_p())
