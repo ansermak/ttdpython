@@ -7,7 +7,7 @@ from django.test import TestCase
 from django.utils.html import escape
 from unittest import skip
 
-from lists.forms import ItemForm, EMPTY_LIST_ERROR
+from lists.forms import ExistingListItemForm, ItemForm, EMPTY_LIST_ERROR
 from lists.models import Item, List
 from lists.views import home_page
 
@@ -69,7 +69,7 @@ class ListViewTest(TestCase):
     def test_displays_item_form(self):
         list_ = List.objects.create()
         response = self.client.get('/lists/{}/'.format(list_.id))
-        self.assertIsInstance(response.context['form'], ItemForm)
+        self.assertIsInstance(response.context['form'], ExistingListItemForm)
         self.assertContains(response, 'name="text"')
 
     def test_can_save_a_POST_request_to_an_existing_list(self):
@@ -95,7 +95,6 @@ class ListViewTest(TestCase):
         )
         self.assertRedirects(response, '/lists/{}/'.format(correct_list.id))
 
-    @skip
     def test_duplicate_item_validation_errors_end_up_on_lists_page(self):
         list1 = List.objects.create()
         item1 = Item.objects.create(list=list1, text='some text')
@@ -105,6 +104,7 @@ class ListViewTest(TestCase):
         )
         expected_error = escape("You've already got this in your list")
         self.assertContains(response, expected_error)
+        self.assertTemplateUsed(response, 'lists/list.html')
         self.assertEqual(Item.objects.all().count(), 1)
 
 
@@ -138,6 +138,7 @@ class NewListTest(TestCase):
         self.assertEqual(List.objects.count(), 0)
         self.assertEqual(Item.objects.count(), 0)
 
+
     def test_for_invalid_input_renders_home_template(self):
         response = self.client.post('/lists/new', data={'text': ''})
         self.assertEqual(response.status_code, 200)
@@ -149,4 +150,4 @@ class NewListTest(TestCase):
 
     def test_for_invalid_input_passes_form_to_template(self):
         response = self.client.post('/lists/new', data={'text': ''})
-        self.assertIsInstance(response.context['form'], ItemForm)
+        self.assertIsInstance(response.context['form'], ExistingListItemForm)

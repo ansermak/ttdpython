@@ -31,7 +31,6 @@ class ItemValidationTest(FunctionalTest):
         self.check_for_row_in_list_table('1: Buy milk')
         self.check_for_row_in_list_table('2: Make tea')
 
-    @skip
     def test_cannot_add_duplicate_items(self):
         # Masha goes to the home page and starts a new list
         self.browser.get(self.server_url)
